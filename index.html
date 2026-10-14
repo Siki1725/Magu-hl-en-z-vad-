@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAGU – Hlášení problémů</title>
+<style>
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;background:#f4f4f4;color:#222;min-height:100vh;display:flex;flex-direction:column}
+header{background:#1d3b2a;color:#fff;padding:14px 20px;font-size:20px;display:flex;justify-content:space-between;align-items:center}
+header button{background:none;border:1px solid #fff;color:#fff;padding:6px 12px;border-radius:6px;font-size:14px;cursor:pointer}
+main{flex:1;max-width:1000px;width:100%;margin:auto;padding:20px;display:flex;flex-direction:column}
+.crumb{color:#555;font-size:16px;margin-bottom:8px;min-height:20px}
+h1{font-size:28px;margin:6px 0 20px;text-align:center}
+.opts{flex:1;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.opts button{font-size:26px;padding:30px 10px;border:3px solid #1d3b2a;background:#fff;border-radius:14px;cursor:pointer;min-height:120px}
+.opts button:active{background:#1d3b2a;color:#fff}
+.big .opts{grid-template-columns:1fr 1fr}.big .opts button{font-size:40px;min-height:45vh}
+.nav{display:flex;gap:12px;margin-top:20px}
+.nav button{flex:1;padding:20px;font-size:20px;border-radius:10px;border:0;cursor:pointer}
+.back{background:#ccc}.save{background:#2e8b57;color:#fff;font-size:24px!important}
+textarea,input{width:100%;font-size:20px;padding:12px;border-radius:8px;border:1px solid #aaa;margin-bottom:14px}
+.sum{background:#fff;border-radius:10px;padding:16px;font-size:20px;line-height:1.7;margin-bottom:16px}
+.ok{text-align:center;font-size:34px;color:#2e8b57;margin-top:15vh}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}td,th{border:1px solid #ccc;padding:6px}
+.small{padding:8px 14px;font-size:14px;margin:0 8px 10px 0;cursor:pointer}
+@media(max-width:600px){.big .opts{grid-template-columns:1fr}.big .opts button{min-height:30vh}}
+</style></head><body>
+<header><span>MAGU – Hlášení problémů</span><button id="zaz">Záznamy</button></header>
+<main id="app"></main>
+<script>
+// === Konfigurace – zde doplňte vlastní názvy ===
+const TECH=["Nová linka","Myčka B"];
+const TYP=["Neočekávaný prostoj","Technická závada"];
+const CASTI={"Nová linka":["Část A","Část B","Část C","Část D"],"Myčka B":["Část A","Část B","Část C","Část D"]};
+const PROBLEMY=["Problém A","Problém B","Problém C","Problém D","Problém E","Problém F","Problém G","Problém H"];
+// ===============================================
+let LS;try{LS=window.localStorage;LS.getItem("x")}catch(e){const m={};LS={getItem:k=>m[k]??null,setItem:(k,v)=>m[k]=String(v),removeItem:k=>delete m[k]}}
+const KEY="magu_hlaseni",app=document.getElementById("app");let s={},krok=0;
+const load=()=>JSON.parse(LS.getItem(KEY)||"[]");
+const esc=x=>(x||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KROKY=[
+ {k:"tech",t:"Vyberte stroj",l:()=>TECH,big:1},
+ {k:"typ",t:"Typ problému",l:()=>TYP},
+ {k:"cast",t:"Na které části stroje?",l:()=>CASTI[s.tech]},
+ {k:"co",t:"Co se stalo?",l:()=>PROBLEMY}];
+function crumb(){return '<div class="crumb">'+["tech","typ","cast","co"].filter(k=>s[k]).map(k=>esc(s[k])).join(" › ")+'</div>'}
+function show(){
+ if(krok<4){const K=KROKY[krok];app.className=K.big?"big":"";
+  app.innerHTML=crumb()+"<h1>"+K.t+'</h1><div class="opts">'+K.l().map((v,i)=>'<button data-i="'+i+'">'+esc(v)+"</button>").join("")+"</div>"+(krok?'<div class="nav"><button class="back">← Zpět</button></div>':"");
+  app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{s[K.k]=K.l()[b.dataset.i];krok++;show()});
+ }else{app.className="";
+  app.innerHTML='<h1>Kontrola a uložení</h1><div class="sum">Stroj: <b>'+esc(s.tech)+"</b><br>Typ: <b>"+esc(s.typ)+"</b><br>Část: <b>"+esc(s.cast)+"</b><br>Problém: <b>"+esc(s.co)+'</b></div><input id="op" placeholder="Jméno operátora" value="'+esc(LS.getItem("magu_op"))+'"><textarea id="pozn" rows="3" placeholder="Poznámka (nepovinné)"></textarea><div class="nav"><button class="back">← Zpět</button><button class="save">Uložit hlášení</button></div>';
+  app.querySelector(".save").onclick=()=>{const op=document.getElementById("op").value;LS.setItem("magu_op",op);const d=load();d.push({cas:new Date().toLocaleString("cs-CZ"),op,...s,pozn:document.getElementById("pozn").value});LS.setItem(KEY,JSON.stringify(d));app.innerHTML='<div class="ok">✔ Hlášení uloženo</div>';s={};krok=0;setTimeout(show,2000)};
+ }
+ const bk=app.querySelector(".back");if(bk)bk.onclick=()=>{krok--;delete s[KROKY[krok].k];show()};
+}
+document.getElementById("zaz").onclick=()=>{app.className="";
+ app.innerHTML='<h1>Záznamy</h1><div><button class="small" id="nove">← Nové hlášení</button><button class="small" id="csv">Export CSV</button><button class="small" id="clr">Smazat vše</button></div><table><tr><th>Čas</th><th>Operátor</th><th>Stroj</th><th>Typ</th><th>Část</th><th>Problém</th><th>Poznámka</th></tr>'+load().slice().reverse().map(r=>"<tr>"+[r.cas,r.op,r.tech,r.typ,r.cast,r.co,r.pozn].map(x=>"<td>"+esc(x)+"</td>").join("")+"</tr>").join("")+"</table>";
+ nove.onclick=()=>{s={};krok=0;show()};
+ csv.onclick=()=>{const h=["cas","op","tech","typ","cast","co","pozn"];const t="\ufeff"+["Čas;Operátor;Stroj;Typ;Část;Problém;Poznámka",...load().map(r=>h.map(k=>'"'+(r[k]||"").replace(/"/g,'""')+'"').join(";"))].join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));a.download="hlaseni.csv";a.click()};
+ clr.onclick=()=>{if(confirm("Opravdu smazat všechny záznamy?")){LS.removeItem(KEY);zaz.onclick()}};
+};
+show();
+</script></body></html>
