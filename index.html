@@ -144,7 +144,7 @@ h1 {
   color: var(--ink);
 }
 .big .opts { grid-template-columns: 1fr 1fr; }
-.big .opts button { font-size: 40px; min-height: 45vh; }
+.big .opts button { font-size: 34px; min-height: 180px; }
 .nav {
   display: flex;
   gap: 12px;
@@ -172,6 +172,21 @@ h1 {
   font-weight: 800;
 }
 .save:active { background: var(--green-press); }
+.skip {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  margin: 0 0 16px;
+  padding: 18px 16px;
+  font-size: 22px;
+  font-weight: 800;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: var(--green);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.skip:active { background: var(--green-press); }
 textarea, input {
   width: 100%;
   font-size: 20px;
@@ -245,8 +260,8 @@ tr:nth-child(even) td { background: var(--paper); }
 }
 .small:active { background: var(--green); }
 @media (max-width: 600px) {
-  .big .opts { grid-template-columns: 1fr; }
-  .big .opts button { min-height: 30vh; font-size: 36px; }
+  .big .opts { grid-template-columns: 1fr 1fr; }
+  .big .opts button { min-height: 132px; font-size: 22px; padding: 16px 10px; }
   h1 { font-size: 28px; }
   .brand { font-size: 16px; }
 }
@@ -266,11 +281,118 @@ tr:nth-child(even) td { background: var(--paper); }
 </header>
 <main id="app"></main>
 <script>
-// === Konfigurace – zde doplňte vlastní názvy ===
-const TECH=["Nová linka","Myčka B"];
-const TYP=["Neočekávaný prostoj","Technická závada"];
-const CASTI={"Nová linka":["Část A","Část B","Část C","Část D"],"Myčka B":["Část A","Část B","Část C","Část D"]};
-const PROBLEMY=["Problém A","Problém B","Problém C","Problém D","Problém E","Problém F","Problém G","Problém H"];
+// === Konfigurace ===
+// Zdroje viz research-zavady.md. Položky /* ? */ jsou slabě doložené.
+const TECH = [
+  "Nová linka",
+  "Stará linka",
+  "Myčka B",          // předáci píší „mycí linka (B)“
+  "Džusárna",
+  "Varna F4",
+  "Chlazení",
+  // "Fermentace / tanky", // volitelně
+  // "Potiskovačka",       // volitelně – zatím jen testy
+];
+
+const TYP = [
+  "Neočekávaný prostoj",
+  "Technická závada",
+  // "Problém s kvalitou", // volitelně – viz kap. 5
+];
+
+const CASTI = {
+  "Nová linka": [
+    "Dopravníkové pásy",
+    "Výplach / oplach lahví (ramena, pružiny, ozubené kolo)",
+    "Plnicí hlavy kombuchy",
+    "Přívod CO2 / odfuk plynu",
+    "Plnička džusu (džusovačka)",
+    "Dávkovač odpěňovače",
+    "Víčkovačka / zavíračka (hlavy, kleště)",
+    "Podavač a pás víček (ofuk, kamera Keyence)",
+    "Sleevovačka",
+    "Datumovačka",
+    "Pohon pod linkou (motor, řemeny, ložiska)",
+    "Elektro / rozvaděč / displej",
+    "Jiné",
+  ],
+  "Stará linka": [ /* ? */ "Plnění kombuchy", "Dávkování džusu (píst)", "Zavírání víček", "Dopravník", "Jiné" ],
+  "Myčka B": [
+    "Zásobník a vstup lahví (kotouč, mantinely)",
+    "Dopravníkový pás a čidla",
+    "Ultrazvuková jednotka (US, centrifuga)",
+    "Vnitřní kartáče a převodovka",
+    "Vnější kartáčové jednotky",
+    "Předoplach a trysky",
+    "Finální oplach / nádrž / filtr",
+    "Těsnění, průtokoměr, odpady",
+    "Elektro / ohřev vody",
+    "Jiné",
+  ],
+  "Džusárna": ["Odšťavňovač J80", "Šnekový džusovač", "Čerpadlo", "Elektro (zásuvky, vařiče)", "Chladicí box / dveře", "Jiné"],
+  "Varna F4": ["Varna (míchadlo, ložiska)", "Parní kotel / parovod", "Čerpadla a pojezd", "Průtokový ohřívač", "Indukční varné desky", "Solenoidy / průtokoměr", "VZT / ventilátor", "Topení / rozvody vody", "Jiné"],
+  "Chlazení": ["Glykolový okruh / nádrž", "Chiller", "Chladicí box (kondenzát, čerpadlo)", "Kompresor chladicích boxů", "CO2 svazek / redukční ventily", "Čidla teploty (Meross)", "Jiné"],
+};
+
+const PROBLEMY = {
+  "Nová linka": [
+    "Strhává / trhá sleeve",
+    "Víčkovačka zavírá nakřivo / neutahuje",
+    "Víčkovačka deformuje / ohýbá víčka",
+    "Odpadla silikonová část kleští",
+    "Džus přeplňuje / nenaplní lahev",
+    "Zaseknutá plnicí hlava džusu",
+    "Odpadlo těsnění džusovačky",
+    "Únik CO2 / plyn nejde do linky",
+    "Špatný odfuk plynu / nedolitá kombucha",
+    "Únik / chybí těsnění na hlavě kombuchy",
+    "Odpěňovač kape / nedávkuje",
+    "Zaseklá lahev (oplach, ozubené kolo)",
+    "Prasklá lahev ve stroji",
+    "Prasklá pružina",
+    "Čidlo (víčkovačka, datumovačka, lahve)",
+    "Chyba hladinoměru džusu",
+    "Neobvyklý zvuk",
+    "Jiné",
+  ],
+  "Stará linka": ["Dávkování džusu nefunguje", "Jiné"], // ? slabá data
+  "Myčka B": [
+    "Lahve nejdou do US / chyba čidel",
+    "Pískání ultrazvuku",
+    "Ulomený / ohnutý kartáček",
+    "Zaseklá lahev",
+    "Ucpané trysky",
+    "Únik vody / netěsnost",
+    "Porucha převodovky kartáčů",
+    "Vypadává jistič / chránič",
+    "Myčka jede pomaleji",
+    "Jiné",
+  ],
+  "Džusárna": ["Džusovač nejede", "Tupý / poškozený nůž", "Čerpadlo nejede / zadřené", "Přehřátá zásuvka / elektro", "Jiné"],
+  "Varna F4": ["Únik vody / páry (varna, parovod, topení)", "Nefunkční ohřev", "Porucha čerpadla", "Vibrace / hluk VZT", "Jiné"],
+  "Chlazení": ["Únik glykolu", "Teče kondenzát", "Chlazení nestíhá", "Zamrzá redukční ventil CO2", "Porucha kompresoru", "Jiné"],
+};
+
+// Volitelný krok „Kdo řešil“
+const FIRMY = [
+  "Interní údržba (Z. Soukup / M. Jeník)",
+  "Omega Inox",
+  "Festo",
+  "HENNLICH",
+  "Vlk (pouzdra)",
+  "E-THERM",
+  "A.T. Fornax",
+  "BS vinařské potřeby",
+  "Refri systémy",
+  "Jedlička (chlazení)",
+  "ESIKO (J. Modlinger)",
+  "p. Michalik (gastro servis)",
+  "e-plast",
+  "Keyence servis (p. Vlček)",
+  "Impera",
+  "SATRA GLOBAL",
+  "Jiné",
+];
 // ===============================================
 let LS;try{LS=window.localStorage;LS.getItem("x")}catch(e){const m={};LS={getItem:k=>m[k]??null,setItem:(k,v)=>m[k]=String(v),removeItem:k=>delete m[k]}}
 const KEY="magu_hlaseni",app=document.getElementById("app");let s={},krok=0;
@@ -279,23 +401,25 @@ const esc=x=>(x||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"
 const KROKY=[
  {k:"tech",t:"Vyberte stroj",l:()=>TECH,big:1},
  {k:"typ",t:"Typ problému",l:()=>TYP},
- {k:"cast",t:"Na které části stroje?",l:()=>CASTI[s.tech]},
- {k:"co",t:"Co se stalo?",l:()=>PROBLEMY}];
-function crumb(){return '<div class="crumb">'+["tech","typ","cast","co"].filter(k=>s[k]).map(k=>esc(s[k])).join(" › ")+'</div>'}
+ {k:"cast",t:"Na které části stroje?",l:()=>CASTI[s.tech]||[]},
+ {k:"co",t:"Co se stalo?",l:()=>PROBLEMY[s.tech]||[]},
+ {k:"firma",t:"Kdo řešil?",l:()=>FIRMY,skip:1}];
+function crumb(){return '<div class="crumb">'+["tech","typ","cast","co","firma"].filter(k=>s[k]).map(k=>esc(s[k])).join(" › ")+'</div>'}
 function show(){
- if(krok<4){const K=KROKY[krok];app.className=K.big?"big":"";
-  app.innerHTML=crumb()+"<h1>"+K.t+'</h1><div class="opts">'+K.l().map((v,i)=>'<button data-i="'+i+'">'+esc(v)+"</button>").join("")+"</div>"+(krok?'<div class="nav"><button class="back">← Zpět</button></div>':"");
+ if(krok<KROKY.length){const K=KROKY[krok];app.className=K.big?"big":"";
+  app.innerHTML=crumb()+"<h1>"+K.t+"</h1>"+(K.skip?'<button class="skip">Přeskočit</button>':"")+'<div class="opts">'+K.l().map((v,i)=>'<button data-i="'+i+'">'+esc(v)+"</button>").join("")+"</div>"+(krok?'<div class="nav"><button class="back">← Zpět</button></div>':"");
   app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{s[K.k]=K.l()[b.dataset.i];krok++;show()});
+  const sk=app.querySelector(".skip");if(sk)sk.onclick=()=>{delete s.firma;krok++;show()};
  }else{app.className="";
-  app.innerHTML='<h1>Kontrola a uložení</h1><div class="sum">Stroj: <b>'+esc(s.tech)+"</b><br>Typ: <b>"+esc(s.typ)+"</b><br>Část: <b>"+esc(s.cast)+"</b><br>Problém: <b>"+esc(s.co)+'</b></div><input id="op" placeholder="Jméno operátora" value="'+esc(LS.getItem("magu_op"))+'"><textarea id="pozn" rows="3" placeholder="Poznámka (nepovinné)"></textarea><div class="nav"><button class="back">← Zpět</button><button class="save">Uložit hlášení</button></div>';
+  app.innerHTML='<h1>Kontrola a uložení</h1><div class="sum">Stroj: <b>'+esc(s.tech)+"</b><br>Typ: <b>"+esc(s.typ)+"</b><br>Část: <b>"+esc(s.cast)+"</b><br>Problém: <b>"+esc(s.co)+"</b><br>Kdo řešil: <b>"+esc(s.firma)+'</b></div><input id="op" placeholder="Jméno operátora" value="'+esc(LS.getItem("magu_op"))+'"><textarea id="pozn" rows="3" placeholder="Poznámka (nepovinné)"></textarea><div class="nav"><button class="back">← Zpět</button><button class="save">Uložit hlášení</button></div>';
   app.querySelector(".save").onclick=()=>{const op=document.getElementById("op").value;LS.setItem("magu_op",op);const d=load();d.push({cas:new Date().toLocaleString("cs-CZ"),op,...s,pozn:document.getElementById("pozn").value});LS.setItem(KEY,JSON.stringify(d));app.innerHTML='<div class="ok">✔ Hlášení uloženo</div>';s={};krok=0;setTimeout(show,2000)};
  }
  const bk=app.querySelector(".back");if(bk)bk.onclick=()=>{krok--;delete s[KROKY[krok].k];show()};
 }
 document.getElementById("zaz").onclick=()=>{app.className="";
- app.innerHTML='<h1>Záznamy</h1><div><button class="small" id="nove">← Nové hlášení</button><button class="small" id="csv">Export CSV</button><button class="small" id="clr">Smazat vše</button></div><table><tr><th>Čas</th><th>Operátor</th><th>Stroj</th><th>Typ</th><th>Část</th><th>Problém</th><th>Poznámka</th></tr>'+load().slice().reverse().map(r=>"<tr>"+[r.cas,r.op,r.tech,r.typ,r.cast,r.co,r.pozn].map(x=>"<td>"+esc(x)+"</td>").join("")+"</tr>").join("")+"</table>";
+ app.innerHTML='<h1>Záznamy</h1><div><button class="small" id="nove">← Nové hlášení</button><button class="small" id="csv">Export CSV</button><button class="small" id="clr">Smazat vše</button></div><table><tr><th>Čas</th><th>Operátor</th><th>Stroj</th><th>Typ</th><th>Část</th><th>Problém</th><th>Kdo řešil</th><th>Poznámka</th></tr>'+load().slice().reverse().map(r=>"<tr>"+[r.cas,r.op,r.tech,r.typ,r.cast,r.co,r.firma,r.pozn].map(x=>"<td>"+esc(x)+"</td>").join("")+"</tr>").join("")+"</table>";
  nove.onclick=()=>{s={};krok=0;show()};
- csv.onclick=()=>{const h=["cas","op","tech","typ","cast","co","pozn"];const t="\ufeff"+["Čas;Operátor;Stroj;Typ;Část;Problém;Poznámka",...load().map(r=>h.map(k=>'"'+(r[k]||"").replace(/"/g,'""')+'"').join(";"))].join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));a.download="hlaseni.csv";a.click()};
+ csv.onclick=()=>{const h=["cas","op","tech","typ","cast","co","firma","pozn"];const t="\ufeff"+["Čas;Operátor;Stroj;Typ;Část;Problém;Kdo řešil;Poznámka",...load().map(r=>h.map(k=>'"'+(r[k]||"").replace(/"/g,'""')+'"').join(";"))].join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));a.download="hlaseni.csv";a.click()};
  clr.onclick=()=>{if(confirm("Opravdu smazat všechny záznamy?")){LS.removeItem(KEY);zaz.onclick()}};
 };
 show();
