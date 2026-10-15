@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<!-- Hlášení závad MAGU. V Apps Script vložte celý tento soubor jako HTML soubor s názvem Index. -->
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#26E126">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hlášení">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Hlášení závad MAGU</title>
+<link rel="apple-touch-icon" href="https://siki1725.github.io/Magu-hl-en-z-vad-/apple-touch-icon.png">
+<link rel="icon" href="https://siki1725.github.io/Magu-hl-en-z-vad-/apple-touch-icon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #363636;
+  --green: #26E126;
+  --green-press: #1cd91c;
+  --paper: #FAFAFA;
+  --white: #ffffff;
+  --muted: #a1a19b;
+  --line: #e9e9e9;
+  --shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+* { box-sizing: border-box; }
+html { height: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Helvetica Neue", Inter, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.35;
+  -webkit-text-size-adjust: 100%;
+}
+button, input, textarea { font-family: inherit; color: inherit; }
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+header {
+  background: var(--white);
+  color: var(--ink);
+  padding: calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 4px solid var(--green);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.brand svg {
+  height: 42px;
+  width: auto;
+  flex: none;
+  display: block;
+}
+header button {
+  flex: none;
+  background: var(--white);
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 12px 18px;
+  min-height: 52px;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+header button:active {
+  background: var(--green);
+  border-color: var(--ink);
+}
+main {
+  flex: 1;
+  max-width: 1000px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+.crumb {
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  min-height: 22px;
+}
+h1 {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 4px 0 18px;
+  text-align: center;
+  color: var(--ink);
+}
+.opts {
+  flex: 1;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  align-content: start;
+}
+.opts button {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  padding: 24px 18px;
+  border: 2px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 999px;
+  min-height: 120px;
+  box-shadow: var(--shadow);
+}
+.opts button:active {
+  background: var(--green);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.big .opts { grid-template-columns: 1fr 1fr; }
+.big .opts button { font-size: 34px; min-height: 180px; }
+.nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.nav button {
+  flex: 1;
+  min-height: 72px;
+  padding: 18px 16px;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.nav button:active { background: var(--green); }
+.back { background: var(--white); }
+.save {
+  background: var(--green);
+  color: var(--ink);
+  border-color: var(--ink);
+  font-size: 24px !important;
+  font-weight: 800;
+}
+.save:active { background: var(--green-press); }
+.skip {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  margin: 0 0 16px;
+  padding: 18px 16px;
+  font-size: 22px;
+  font-weight: 800;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: var(--green);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.skip:active { background: var(--green-press); }
+textarea, input {
+  width: 100%;
+  font-size: 20px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 2px solid var(--ink);
+  background: var(--white);
+  margin-bottom: 14px;
+  min-height: 60px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+textarea { min-height: 110px; resize: vertical; }
+textarea:focus, input:focus, button:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+}
+::placeholder { color: #9e9e9e; }
+.sum {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 18px 18px;
+  font-size: 20px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+  border: 2px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.sum b { font-weight: 700; }
+.ok {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  background: var(--green);
+  border-radius: 28px;
+  padding: 36px 18px;
+  margin-top: 12vh;
+  box-shadow: var(--shadow);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  font-size: 16px;
+  box-shadow: var(--shadow);
+}
+td, th {
+  border: 1px solid var(--line);
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--green);
+  color: var(--ink);
+  font-weight: 700;
+}
+tr:nth-child(even) td { background: var(--paper); }
+.small {
+  min-height: 52px;
+  padding: 12px 16px;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 8px 12px 0;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.small:active { background: var(--green); }
+@media (max-width: 600px) {
+  .big .opts { grid-template-columns: 1fr 1fr; }
+  .big .opts button { min-height: 132px; font-size: 22px; padding: 16px 10px; }
+  h1 { font-size: 28px; }
+  .brand { font-size: 16px; }
+}
+
+a.small {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  line-height: 1.2;
+  color: var(--ink);
+}
+a.small:active { background: var(--green); }
+button:disabled { opacity: 0.7; }
+.note {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+.err {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: var(--white);
+  border: 3px solid #C41616;
+  border-radius: 28px;
+  padding: 28px 18px;
+  margin-top: 8vh;
+  box-shadow: var(--shadow);
+}
+.err p { margin: 0 0 16px; }
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 928 768" aria-hidden="true" focusable="false">
+      <g transform="translate(0,768) scale(0.1,-0.1)" fill="#363636">
+        <path d="M2605 7599 c-116 -11 -196 -34 -312 -89 -543 -258 -960 -856 -1300 -1865 -305 -902 -662 -2548 -808 -3723 -77 -621 -138 -1465 -116 -1588 33 -175 140 -278 290 -278 119 1 222 69 279 187 40 83 49 137 62 367 34 628 113 1252 265 2085 180 986 365 1747 597 2455 296 907 463 1263 718 1534 163 173 357 270 476 237 86 -23 167 -129 207 -271 22 -76 52 -263 77 -470 84 -717 91 -1520 20 -2515 -24 -345 -16 -397 76 -495 61 -65 129 -94 220 -94 132 0 246 79 300 207 13 30 44 157 69 283 115 567 213 874 349 1084 111 171 262 273 359 240 84 -27 176 -183 240 -405 19 -66 58 -219 87 -340 29 -121 61 -242 71 -270 27 -72 85 -142 152 -183 50 -31 68 -36 136 -40 87 -5 138 11 199 63 74 63 100 131 137 359 42 266 80 386 145 459 39 45 64 47 118 7 52 -37 96 -98 205 -282 102 -171 201 -306 319 -435 547 -599 1389 -1026 2283 -1157 216 -32 403 -46 458 -35 156 33 271 168 252 297 -9 62 -50 137 -95 172 -62 49 -125 67 -315 89 -502 59 -882 172 -1285 383 -398 207 -734 499 -972 843 -30 44 -99 154 -153 245 -53 91 -125 203 -158 249 -88 123 -237 273 -331 336 -264 175 -528 121 -716 -147 l-48 -68 -47 87 c-121 223 -252 370 -392 441 -106 52 -172 66 -303 60 -83 -4 -124 -12 -200 -37 -159 -54 -316 -149 -419 -255 -24 -25 -48 -43 -53 -40 -4 3 -8 42 -8 87 0 290 -80 1153 -130 1398 -46 226 -131 408 -251 535 -198 212 -477 320 -754 293z"/>
+      </g>
+    </svg>
+    <span>MAGU – Hlášení problémů</span>
+  </span>
+  <button id="zaz" type="button">Záznamy</button>
+</header>
+<main id="app"></main>
+<script id="account" type="application/json"><?!= userEmailJson ?></script>
+<script>
+// === Konfigurace ===
+// Zdroje viz research-zavady.md. Položky /* ? */ jsou slabě doložené.
+const TECH = [
+  "Nová linka",
+  "Stará linka",
+  "Myčka B",          // předáci píší „mycí linka (B)“
+  "Džusárna",
+  "Varna F4",
+  "Chlazení",
+  // "Fermentace / tanky", // volitelně
+  // "Potiskovačka",       // volitelně – zatím jen testy
+];
+
+const TYP = [
+  "Neočekávaný prostoj",
+  "Technická závada",
+  // "Problém s kvalitou", // volitelně – viz kap. 5
+];
+
+const CASTI = {
+  "Nová linka": [
+    "Dopravníkové pásy",
+    "Výplach / oplach lahví (ramena, pružiny, ozubené kolo)",
+    "Plnicí hlavy kombuchy",
+    "Přívod CO2 / odfuk plynu",
+    "Plnička džusu (džusovačka)",
+    "Dávkovač odpěňovače",
+    "Víčkovačka / zavíračka (hlavy, kleště)",
+    "Podavač a pás víček (ofuk, kamera Keyence)",
+    "Sleevovačka",
+    "Datumovačka",
+    "Pohon pod linkou (motor, řemeny, ložiska)",
+    "Elektro / rozvaděč / displej",
+    "Jiné",
+  ],
+  "Stará linka": [ /* ? */ "Plnění kombuchy", "Dávkování džusu (píst)", "Zavírání víček", "Dopravník", "Jiné" ],
+  "Myčka B": [
+    "Zásobník a vstup lahví (kotouč, mantinely)",
+    "Dopravníkový pás a čidla",
+    "Ultrazvuková jednotka (US, centrifuga)",
+    "Vnitřní kartáče a převodovka",
+    "Vnější kartáčové jednotky",
+    "Předoplach a trysky",
+    "Finální oplach / nádrž / filtr",
+    "Těsnění, průtokoměr, odpady",
+    "Elektro / ohřev vody",
+    "Jiné",
+  ],
+  "Džusárna": ["Odšťavňovač J80", "Šnekový džusovač", "Čerpadlo", "Elektro (zásuvky, vařiče)", "Chladicí box / dveře", "Jiné"],
+  "Varna F4": ["Varna (míchadlo, ložiska)", "Parní kotel / parovod", "Čerpadla a pojezd", "Průtokový ohřívač", "Indukční varné desky", "Solenoidy / průtokoměr", "VZT / ventilátor", "Topení / rozvody vody", "Jiné"],
+  "Chlazení": ["Glykolový okruh / nádrž", "Chiller", "Chladicí box (kondenzát, čerpadlo)", "Kompresor chladicích boxů", "CO2 svazek / redukční ventily", "Čidla teploty (Meross)", "Jiné"],
+};
+
+const PROBLEMY = {
+  "Nová linka": [
+    "Strhává / trhá sleeve",
+    "Víčkovačka zavírá nakřivo / neutahuje",
+    "Víčkovačka deformuje / ohýbá víčka",
+    "Odpadla silikonová část kleští",
+    "Džus přeplňuje / nenaplní lahev",
+    "Zaseknutá plnicí hlava džusu",
+    "Odpadlo těsnění džusovačky",
+    "Únik CO2 / plyn nejde do linky",
+    "Špatný odfuk plynu / nedolitá kombucha",
+    "Únik / chybí těsnění na hlavě kombuchy",
+    "Odpěňovač kape / nedávkuje",
+    "Zaseklá lahev (oplach, ozubené kolo)",
+    "Prasklá lahev ve stroji",
+    "Prasklá pružina",
+    "Čidlo (víčkovačka, datumovačka, lahve)",
+    "Chyba hladinoměru džusu",
+    "Neobvyklý zvuk",
+    "Jiné",
+  ],
+  "Stará linka": ["Dávkování džusu nefunguje", "Jiné"], // ? slabá data
+  "Myčka B": [
+    "Lahve nejdou do US / chyba čidel",
+    "Pískání ultrazvuku",
+    "Ulomený / ohnutý kartáček",
+    "Zaseklá lahev",
+    "Ucpané trysky",
+    "Únik vody / netěsnost",
+    "Porucha převodovky kartáčů",
+    "Vypadává jistič / chránič",
+    "Myčka jede pomaleji",
+    "Jiné",
+  ],
+  "Džusárna": ["Džusovač nejede", "Tupý / poškozený nůž", "Čerpadlo nejede / zadřené", "Přehřátá zásuvka / elektro", "Jiné"],
+  "Varna F4": ["Únik vody / páry (varna, parovod, topení)", "Nefunkční ohřev", "Porucha čerpadla", "Vibrace / hluk VZT", "Jiné"],
+  "Chlazení": ["Únik glykolu", "Teče kondenzát", "Chlazení nestíhá", "Zamrzá redukční ventil CO2", "Porucha kompresoru", "Jiné"],
+};
+
+// Volitelný krok „Kdo řešil“
+const FIRMY = [
+  "Interní údržba (Z. Soukup / M. Jeník)",
+  "Omega Inox",
+  "Festo",
+  "HENNLICH",
+  "Vlk (pouzdra)",
+  "E-THERM",
+  "A.T. Fornax",
+  "BS vinařské potřeby",
+  "Refri systémy",
+  "Jedlička (chlazení)",
+  "ESIKO (J. Modlinger)",
+  "p. Michalik (gastro servis)",
+  "e-plast",
+  "Keyence servis (p. Vlček)",
+  "Impera",
+  "SATRA GLOBAL",
+  "Jiné",
+];
+// ===============================================
+let LS;
+try {
+  LS = window.localStorage;
+  LS.getItem("x");
+} catch (e) {
+  const m = {};
+  LS = {
+    getItem: function (k) { return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : null; },
+    setItem: function (k, v) { m[k] = String(v); },
+    removeItem: function (k) { delete m[k]; }
+  };
+}
+const QUEUE_KEY = "magu_queue";
+const app = document.getElementById("app");
+let s = {};
+let krok = 0;
+let view = 0;
+let chain = Promise.resolve();
+let repaintRecords = function () {};
+
+function accountEmail() {
+  const node = document.getElementById("account");
+  if (!node) return "";
+  try {
+    const value = JSON.parse(node.textContent.trim());
+    return typeof value === "string" ? value : "";
+  } catch (e) {
+    return "";
+  }
+}
+let ACCOUNT_EMAIL = accountEmail();
+
+const esc = function (x) {
+  return (x || "").replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+};
+const KROKY = [
+  { k: "tech", t: "Vyberte stroj", l: function () { return TECH; }, big: 1 },
+  { k: "typ", t: "Typ problému", l: function () { return TYP; } },
+  { k: "cast", t: "Na které části stroje?", l: function () { return CASTI[s.tech] || []; } },
+  { k: "co", t: "Co se stalo?", l: function () { return PROBLEMY[s.tech] || []; } },
+  { k: "firma", t: "Kdo řešil?", l: function () { return FIRMY; }, skip: 1 }
+];
+
+function hasGas() {
+  const g = window.google;
+  return !!(g && g.script && g.script.run);
+}
+function messageOf(err) {
+  if (!err) return "Neznámá chyba.";
+  if (typeof err === "string") return err;
+  return err.message || "Neznámá chyba.";
+}
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+function queueLoad() {
+  try {
+    const parsed = JSON.parse(LS.getItem(QUEUE_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+function queueSave(items) {
+  LS.setItem(QUEUE_KEY, JSON.stringify(items));
+}
+function enqueueTask(fn) {
+  const run = chain.then(fn, fn);
+  chain = run.then(function () { return null; }, function () { return null; });
+  return run;
+}
+function gasRun(method, arg) {
+  return new Promise(function (resolve, reject) {
+    if (!hasGas()) {
+      reject(new Error("Aplikace neběží v Google Apps Script."));
+      return;
+    }
+    const runner = window.google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(function (err) {
+          reject(err instanceof Error ? err : new Error(messageOf(err)));
+        });
+    if (arguments.length > 1) runner[method](arg);
+    else runner[method]();
+  });
+}
+function persistReport(report) {
+  return enqueueTask(function () {
+    return gasRun("saveReport", report).catch(function (err) {
+      const q = queueLoad();
+      q.push({ id: uid(), report: report });
+      queueSave(q);
+      throw err;
+    });
+  });
+}
+function flushQueue() {
+  return enqueueTask(function () {
+    function step() {
+      const q = queueLoad();
+      if (!q.length || !hasGas()) return Promise.resolve();
+      const item = q[0];
+      return gasRun("saveReport", item.report).then(function () {
+        const cur = queueLoad();
+        const idx = cur.findIndex(function (x) { return x.id === item.id; });
+        if (idx >= 0) cur.splice(idx, 1);
+        queueSave(cur);
+        return step();
+      }).catch(function () {
+        return null;
+      });
+    }
+    return step();
+  });
+}
+function pendingNoteHtml() {
+  const n = queueLoad().length;
+  if (!n) return "";
+  return '<p class="note" id="pending-note">Neodeslaná hlášení v tomto telefonu: ' + n + ". Odešlou se automaticky.</p>";
+}
+function refreshPendingNote() {
+  const note = document.getElementById("pending-note");
+  const n = queueLoad().length;
+  if (!n) {
+    if (note) note.remove();
+    return;
+  }
+  if (note) note.textContent = "Neodeslaná hlášení v tomto telefonu: " + n + ". Odešlou se automaticky.";
+}
+function crumb() {
+  return '<div class="crumb">' + ["tech", "typ", "cast", "co", "firma"].filter(function (k) { return s[k]; }).map(function (k) { return esc(s[k]); }).join(" › ") + "</div>";
+}
+function rememberAccount(email) {
+  if (!email || ACCOUNT_EMAIL) return;
+  ACCOUNT_EMAIL = email;
+  const op = document.getElementById("op");
+  if (op && !op.value && !LS.getItem("magu_op")) op.value = email;
+}
+function refreshAccount() {
+  if (ACCOUNT_EMAIL || !hasGas()) return;
+  gasRun("getAccountEmail").then(rememberAccount).catch(function () {});
+}
+function showOk() {
+  view++;
+  repaintRecords = function () {};
+  app.className = "";
+  app.innerHTML = '<div class="ok">✔ Hlášení uloženo</div>';
+  s = {};
+  krok = 0;
+  setTimeout(function () { show(); }, 2000);
+}
+function showSaveError(err) {
+  view++;
+  repaintRecords = function () {};
+  app.className = "";
+  const waiting = queueLoad().length;
+  const waitingText = waiting
+      ? " V telefonu " + (waiting === 1 ? "čeká" : "čekají") + " " + waiting + " hlášení."
+      : "";
+  app.innerHTML =
+      '<div class="err" id="save-error"><p>Hlášení se nepodařilo uložit do tabulky. Zůstalo v tomto telefonu a odešle se při příštím otevření.</p>' +
+      '<p class="note">' + esc(messageOf(err)) + waitingText + "</p>" +
+      '<div class="nav"><button class="back" id="retry" type="button">Zkusit znovu</button><button class="save" id="fresh" type="button">Nové hlášení</button></div></div>';
+  document.getElementById("retry").onclick = function () {
+    const btn = document.getElementById("retry");
+    btn.disabled = true;
+    btn.textContent = "Odesílám…";
+    flushQueue().then(function () {
+      if (!queueLoad().length) showOk();
+      else showSaveError(new Error("Odeslání se znovu nepodařilo."));
+    });
+  };
+  document.getElementById("fresh").onclick = function () {
+    s = {};
+    krok = 0;
+    show();
+  };
+}
+function show() {
+  const here = ++view;
+  repaintRecords = function () {};
+  if (krok < KROKY.length) {
+    const K = KROKY[krok];
+    app.className = K.big ? "big" : "";
+    app.innerHTML = pendingNoteHtml() + crumb() + "<h1>" + K.t + "</h1>" +
+        (K.skip ? '<button class="skip" type="button">Přeskočit</button>' : "") +
+        '<div class="opts">' + K.l().map(function (v, i) {
+          return '<button type="button" data-i="' + i + '">' + esc(v) + "</button>";
+        }).join("") + "</div>" +
+        (krok ? '<div class="nav"><button class="back" type="button">← Zpět</button></div>' : "");
+    app.querySelectorAll(".opts button").forEach(function (b) {
+      b.onclick = function () {
+        s[K.k] = K.l()[b.dataset.i];
+        krok++;
+        show();
+      };
+    });
+    const sk = app.querySelector(".skip");
+    if (sk) sk.onclick = function () { delete s.firma; krok++; show(); };
+  } else {
+    app.className = "";
+    const savedOp = LS.getItem("magu_op");
+    const opValue = savedOp !== null ? savedOp : (ACCOUNT_EMAIL || "");
+    app.innerHTML = pendingNoteHtml() +
+        '<h1>Kontrola a uložení</h1><div class="sum">Stroj: <b>' + esc(s.tech) + "</b><br>Typ: <b>" + esc(s.typ) +
+        "</b><br>Část: <b>" + esc(s.cast) + "</b><br>Problém: <b>" + esc(s.co) +
+        "</b><br>Kdo řešil: <b>" + esc(s.firma) + '</b></div><input id="op" placeholder="Jméno operátora" value="' +
+        esc(opValue) + '"><textarea id="pozn" rows="3" placeholder="Poznámka (nepovinné)"></textarea><div class="nav"><button class="back" type="button">← Zpět</button><button class="save" type="button">Uložit hlášení</button></div>';
+    const saveBtn = app.querySelector(".save");
+    saveBtn.onclick = function () {
+      if (saveBtn.disabled) return;
+      const op = document.getElementById("op").value;
+      LS.setItem("magu_op", op);
+      const report = {
+        cas: new Date().toLocaleString("cs-CZ"),
+        op: op,
+        tech: s.tech || "",
+        typ: s.typ || "",
+        cast: s.cast || "",
+        co: s.co || "",
+        firma: s.firma || "",
+        pozn: document.getElementById("pozn").value || ""
+      };
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Ukládám…";
+      persistReport(report).then(function () {
+        if (here !== view) return;
+        showOk();
+      }).catch(function (err) {
+        if (here !== view) return;
+        showSaveError(err);
+      });
+    };
+  }
+  const bk = app.querySelector(".back");
+  if (bk && !document.getElementById("save-error")) {
+    bk.onclick = function () {
+      krok--;
+      delete s[KROKY[krok].k];
+      show();
+    };
+  }
+}
+function showRecords() {
+  const here = ++view;
+  repaintRecords = function () {};
+  app.className = "";
+  let sheetRows = [];
+  app.innerHTML =
+      '<h1>Záznamy</h1><div><button class="small" id="nove" type="button">← Nové hlášení</button><button class="small" id="csv" type="button">Export CSV</button><a class="small" id="sheet" target="_blank" rel="noopener" href="#">Otevřít tabulku</a><button class="small" id="clr" type="button">Smazat neodeslané</button></div><p class="note" id="rec-status">Načítám záznamy…</p><table id="tbl"></table>';
+  document.getElementById("nove").onclick = function () { s = {}; krok = 0; show(); };
+  document.getElementById("clr").onclick = function () {
+    if (!confirm("Opravdu smazat hlášení, která ještě nejsou v tabulce?")) return;
+    queueSave([]);
+    showRecords();
+  };
+  const sheetLink = document.getElementById("sheet");
+  sheetLink.onclick = function (ev) {
+    if (sheetLink.getAttribute("href") !== "#") return;
+    ev.preventDefault();
+    gasRun("getSheetUrl").then(function (url) {
+      if (!url) throw new Error("Tabulka nemá adresu.");
+      sheetLink.href = url;
+      window.open(url, "_blank", "noopener");
+    }).catch(function (err) {
+      const text = "Tabulku se nepodařilo otevřít. " + messageOf(err);
+      const status = document.getElementById("rec-status");
+      if (status) status.textContent = text;
+      try { window.alert(text); } catch (e) {}
+    });
+  };
+  function paint() {
+    if (here !== view) return;
+    const pending = queueLoad().map(function (item) {
+      return Object.assign({ pending: true }, item.report);
+    });
+    const visible = pending.concat(sheetRows);
+    document.getElementById("tbl").innerHTML =
+        "<tr><th>Čas</th><th>Operátor</th><th>Stroj</th><th>Typ</th><th>Část</th><th>Problém</th><th>Kdo řešil</th><th>Poznámka</th></tr>" +
+        visible.map(function (r) {
+          const cas = (r.pending ? "čeká · " : "") + (r.cas || "");
+          return "<tr>" + [cas, r.op, r.tech, r.typ, r.cast, r.co, r.firma, r.pozn].map(function (x) {
+            return "<td>" + esc(x) + "</td>";
+          }).join("") + "</tr>";
+        }).join("");
+  }
+  repaintRecords = paint;
+  document.getElementById("csv").onclick = function () {
+    const pending = queueLoad().map(function (item) { return item.report; });
+    const rows = sheetRows.slice().reverse().concat(pending);
+    const keys = ["cas", "op", "tech", "typ", "cast", "co", "firma", "pozn"];
+    const lines = ["Čas;Operátor;Stroj;Typ;Část;Problém;Kdo řešil;Poznámka"].concat(rows.map(function (r) {
+      return keys.map(function (k) {
+        return '"' + String(r[k] || "").replace(/"/g, '""') + '"';
+      }).join(";");
+    }));
+    const a = document.createElement("a");
+    a.href = "data:text/csv;charset=utf-8," + encodeURIComponent("\ufeff" + lines.join("\n"));
+    a.download = "hlaseni.csv";
+    a.click();
+  };
+  gasRun("getReports", 100).then(function (rows) {
+    if (here !== view) return;
+    sheetRows = Array.isArray(rows) ? rows : [];
+    paint();
+    const status = document.getElementById("rec-status");
+    const pending = queueLoad().length;
+    if (!sheetRows.length && !pending) status.textContent = "Zatím žádné záznamy.";
+    else if (pending) status.textContent = "Neodeslaná hlášení v tomto telefonu: " + pending + ".";
+    else status.textContent = "";
+  }).catch(function (err) {
+    if (here !== view) return;
+    paint();
+    document.getElementById("rec-status").textContent = "Záznamy z tabulky se nepodařilo načíst. " + messageOf(err);
+  });
+  gasRun("getSheetUrl").then(function (url) {
+    if (here !== view || !url) return;
+    sheetLink.href = url;
+  }).catch(function () {});
+}
+
+document.getElementById("zaz").onclick = showRecords;
+show();
+refreshAccount();
+flushQueue().then(function () {
+  refreshPendingNote();
+  if (document.getElementById("tbl")) showRecords();
+});
+
+</script>
+</body>
+</html>
